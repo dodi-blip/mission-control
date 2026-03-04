@@ -289,6 +289,9 @@
 
     function renderDashboard(data) {
       const tasks = data.tasks || {};
+      const reminders = data.reminders || [];
+      const crons = data.crons || [];
+      const ideas = data.ideas || [];
       const dashboard = document.getElementById('dashboard');
       const health = document.getElementById('healthSummary');
 
@@ -306,7 +309,7 @@
       const currentCard = createCard(
         '🚀 Current Work',
         tasks.current || [],
-        false
+        'task'
       );
       dashboard.appendChild(currentCard);
 
@@ -314,7 +317,7 @@
       const queueCard = createCard(
         '📋 Task Queue',
         tasks.queue || [],
-        false
+        'task'
       );
       dashboard.appendChild(queueCard);
 
@@ -322,15 +325,45 @@
       const waitingCard = createCard(
         '⏳ Waiting on Dodi',
         tasks.waitingOnDodi || [],
-        false
+        'task'
       );
       dashboard.appendChild(waitingCard);
+
+      // Reminders
+      if (reminders.length > 0) {
+        const remindersCard = createCard(
+          '📌 Reminders',
+          reminders,
+          'reminder'
+        );
+        dashboard.appendChild(remindersCard);
+      }
+
+      // Scheduled Crons
+      if (crons.length > 0) {
+        const cronsCard = createCard(
+          '⏰ Scheduled Automation',
+          crons,
+          'cron'
+        );
+        dashboard.appendChild(cronsCard);
+      }
+
+      // Ideas
+      if (ideas.length > 0) {
+        const ideasCard = createCard(
+          '💡 Ideas Backlog',
+          ideas,
+          'idea'
+        );
+        dashboard.appendChild(ideasCard);
+      }
 
       // Recent Completions
       const completedCard = createCard(
         '✅ Recent Completions',
         tasks.completed || [],
-        true
+        'task'
       );
       dashboard.appendChild(completedCard);
 
@@ -338,12 +371,12 @@
       const blockersCard = createCard(
         '🔴 Blockers',
         tasks.health?.blockers || [],
-        false
+        'task'
       );
       dashboard.appendChild(blockersCard);
     }
 
-    function createCard(title, items, isCompleted) {
+    function createCard(title, items, type = 'task') {
       const card = document.createElement('div');
       card.className = 'card';
 
@@ -365,23 +398,76 @@
         const list = document.createElement('ul');
         list.className = 'task-list';
 
-        items.slice(0, 8).forEach(task => {
-          const item = document.createElement('li');
-          item.className = 'task-item';
-          if (isCompleted) item.classList.add('completed');
-          if (task.priority?.priority === 'urgent') item.classList.add('urgent');
+        items.slice(0, 8).forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'task-item';
 
-          const name = document.createElement('div');
-          name.className = 'task-name';
-          name.textContent = task.name || 'Untitled';
+          // Handle different item types
+          if (type === 'task') {
+            if (item.status?.status === 'closed') li.classList.add('completed');
+            if (item.priority?.priority === 'urgent') li.classList.add('urgent');
 
-          const meta = document.createElement('div');
-          meta.className = 'task-meta';
-          meta.textContent = task.status?.status || 'No status';
+            const name = document.createElement('div');
+            name.className = 'task-name';
+            
+            // Make task name clickable if it has a URL
+            if (item.url) {
+              const link = document.createElement('a');
+              link.href = item.url;
+              link.target = '_blank';
+              link.textContent = item.name || 'Untitled';
+              link.style.color = '#60a5fa';
+              link.style.textDecoration = 'none';
+              link.style.cursor = 'pointer';
+              link.onmouseover = () => link.style.textDecoration = 'underline';
+              link.onmouseout = () => link.style.textDecoration = 'none';
+              name.appendChild(link);
+            } else {
+              name.textContent = item.name || 'Untitled';
+            }
 
-          item.appendChild(name);
-          item.appendChild(meta);
-          list.appendChild(item);
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+            meta.textContent = item.status?.status || 'No status';
+
+            li.appendChild(name);
+            li.appendChild(meta);
+          } else if (type === 'reminder') {
+            const name = document.createElement('div');
+            name.className = 'task-name';
+            name.textContent = item.title || 'Untitled';
+
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+            meta.textContent = item.description || 'No description';
+
+            li.appendChild(name);
+            li.appendChild(meta);
+          } else if (type === 'cron') {
+            const name = document.createElement('div');
+            name.className = 'task-name';
+            name.textContent = item.name || 'Untitled';
+
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+            meta.textContent = `Next: ${new Date(item.nextRun).toLocaleString()}`;
+
+            li.appendChild(name);
+            li.appendChild(meta);
+          } else if (type === 'idea') {
+            const name = document.createElement('div');
+            name.className = 'task-name';
+            name.textContent = item.title || 'Untitled';
+
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+            meta.textContent = item.description || 'No description';
+
+            li.appendChild(name);
+            li.appendChild(meta);
+          }
+
+          list.appendChild(li);
         });
 
         card.appendChild(list);

@@ -1,9 +1,12 @@
 const express = require('express');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 
 const CLICKUP_TOKEN = process.env.CLICKUP_TOKEN || 'pk_10935568_X9CYUYXG7KGVUHF0J6T86HMOTGN44AAP';
 const CLICKUP_API = 'https://api.clickup.com/api/v2';
+const WORKSPACE_PATH = process.env.WORKSPACE_PATH || '/root/.openclaw/workspace';
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -11,8 +14,146 @@ app.use(express.json());
 // Cache for API data
 let cachedData = {
   tasks: [],
+  reminders: [],
+  crons: [],
+  ideas: [],
   timestamp: null
 };
+
+// Read HEARTBEAT.md for reminders
+function getReminders() {
+  try {
+    const heartbeatPath = path.join(WORKSPACE_PATH, 'HEARTBEAT.md');
+    if (!fs.existsSync(heartbeatPath)) return [];
+    
+    const content = fs.readFileSync(heartbeatPath, 'utf8');
+    const reminders = [];
+    
+    // Parse markdown list items as reminders
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const match = line.match(/^-\s+(.+?)(?:\s*-\s*(.+))?$/);
+      if (match) {
+        reminders.push({
+          title: match[1],
+          description: match[2] || '',
+          source: 'HEARTBEAT.md'
+        });
+      }
+    }
+    
+    return reminders;
+  } catch (e) {
+    console.log('Error reading HEARTBEAT.md:', e.message);
+    return [];
+  }
+}
+
+// Read ideas.md for ideas list
+function getIdeas() {
+  try {
+    const ideasPath = path.join(WORKSPACE_PATH, 'memory', 'ideas.md');
+    if (!fs.existsSync(ideasPath)) return [];
+    
+    const content = fs.readFileSync(ideasPath, 'utf8');
+    const ideas = [];
+    
+    // Parse markdown list items as ideas
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const match = line.match(/^-\s+(.+?)(?:\s*-\s*(.+))?$/);
+      if (match && !line.includes('|') && !line.includes('#')) {
+        ideas.push({
+          title: match[1],
+          description: match[2] || '',
+          status: 'backlog'
+        });
+      }
+    }
+    
+    return ideas.slice(0, 10); // Top 10 ideas
+  } catch (e) {
+    console.log('Error reading ideas.md:', e.message);
+    return [];
+  }
+}
+
+// Get cron jobs from config file or crontab
+function getCronJobs() {
+  const crons = [];
+  
+  // Try reading from workspace cron config
+  try {
+    const cronsPath = path.join(WORKSPACE_PATH, '.config', 'crons.json');
+    if (fs.existsSync(cronsPath)) {
+      const content = fs.readFileSync(cronsPath, 'utf8');
+      const config = JSON.parse(content);
+      
+      if (Array.isArray(config)) {
+        config.forEach(cron => {
+          crons.push({
+            name: cron.name || 'Unnamed',
+            schedule: cron.schedule || '*',
+            command: cron.command || '',
+            nextRun: cron.nextRun || new Date().toISOString()
+          });
+        });
+      }
+      
+      return crons;
+    }
+  } catch (e) {
+    console.log('Note: Could not read crons.json:', e.message);
+  }
+  
+  // Fallback: try crontab (may not work in container)
+  try {
+    const { execSync } = require('child_process');
+    const result = execSync('crontab -l 2>/dev/null || echo ""', { encoding: 'utf8' });
+    const lines = result.split('\n');
+    
+    for (const line of lines) {
+      if (line.startsWith('#') || !line.trim()) continue;
+      
+      const parts = line.split(/\s+/);
+      if (parts.length < 6) continue;
+      
+      const [minute, hour, day, month, weekday, ...cmdParts] = parts;
+      const command = cmdParts.join(' ');
+      
+      let name = command;
+      const match = command.match(/(?:openclaw|cron).*?([a-z-]+)/i);
+      if (match) name = match[1];
+      
+      crons.push({
+        name,
+        schedule: `${minute} ${hour} * * ${weekday}`,
+        command,
+        nextRun: calculateNextRun(minute, hour, weekday)
+      });
+    }
+  } catch (e) {
+    // Silently fail - crontab may not be available
+  }
+  
+  return crons;
+}
+
+// Simple cron schedule parser
+function calculateNextRun(minute, hour, weekday) {
+  const now = new Date();
+  const next = new Date(now);
+  
+  // Very simple: if hour is specified, next run is tomorrow at that hour
+  if (hour !== '*') {
+    next.setDate(next.getDate() + 1);
+    next.setHours(parseInt(hour), parseInt(minute), 0);
+  } else {
+    next.setMinutes(next.getMinutes() + parseInt(minute));
+  }
+  
+  return next.toISOString();
+}
 
 // Fetch tasks from ClickUp
 async function fetchClickUpData() {
@@ -60,11 +201,25 @@ async function fetchClickUpData() {
       }
     }
     
+    // Add clickable URLs to tasks
+    allTasks = allTasks.map(task => ({
+      ...task,
+      url: `https://app.clickup.com/t/${task.id}`
+    }));
+    
     // Categorize tasks
     const categorized = categorizeTasks(allTasks);
     
+    // Get additional data
+    const reminders = getReminders();
+    const crons = getCronJobs();
+    const ideas = getIdeas();
+    
     cachedData = {
       tasks: categorized,
+      reminders,
+      crons,
+      ideas,
       timestamp: new Date().toISOString(),
       teamId
     };
