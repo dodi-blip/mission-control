@@ -43,7 +43,7 @@ async function fetchClickUpData() {
           allTasks = allTasks.concat(tasksRes.data.tasks);
         }
       } catch (e) {
-        console.log(`Error fetching tasks from space ${space.id}`);
+        console.log(`Error fetching tasks from space ${space.id}:`, e.response?.status, e.response?.data?.err || e.message);
       }
     }
     
@@ -58,7 +58,8 @@ async function fetchClickUpData() {
     
     return cachedData;
   } catch (error) {
-    console.error('ClickUp API Error:', error.message);
+    console.error('ClickUp API Error:', error.response?.status, error.response?.data || error.message);
+    console.error('Token status:', CLICKUP_TOKEN ? 'Present' : 'MISSING');
     return cachedData; // Return cached data if API fails
   }
 }
