@@ -6,7 +6,7 @@ const app = express();
 
 const CLICKUP_TOKEN = process.env.CLICKUP_TOKEN || 'pk_10935568_X9CYUYXG7KGVUHF0J6T86HMOTGN44AAP';
 const CLICKUP_API = 'https://api.clickup.com/api/v2';
-const WORKSPACE_PATH = process.env.WORKSPACE_PATH || '/root/.openclaw/workspace';
+const DATA_PATH = path.join(__dirname, 'data');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -23,7 +23,7 @@ let cachedData = {
 // Read HEARTBEAT.md for reminders
 function getReminders() {
   try {
-    const heartbeatPath = path.join(WORKSPACE_PATH, 'HEARTBEAT.md');
+    const heartbeatPath = path.join(DATA_PATH, 'HEARTBEAT.md');
     if (!fs.existsSync(heartbeatPath)) return [];
     
     const content = fs.readFileSync(heartbeatPath, 'utf8');
@@ -33,7 +33,7 @@ function getReminders() {
     const lines = content.split('\n');
     for (const line of lines) {
       const match = line.match(/^-\s+(.+?)(?:\s*-\s*(.+))?$/);
-      if (match) {
+      if (match && !line.includes('|') && !line.includes('#')) {
         reminders.push({
           title: match[1],
           description: match[2] || '',
@@ -52,7 +52,7 @@ function getReminders() {
 // Read ideas.md for ideas list
 function getIdeas() {
   try {
-    const ideasPath = path.join(WORKSPACE_PATH, 'memory', 'ideas.md');
+    const ideasPath = path.join(DATA_PATH, 'ideas.md');
     if (!fs.existsSync(ideasPath)) return [];
     
     const content = fs.readFileSync(ideasPath, 'utf8');
@@ -82,9 +82,9 @@ function getIdeas() {
 function getCronJobs() {
   const crons = [];
   
-  // Try reading from workspace cron config
+  // Try reading from data directory cron config
   try {
-    const cronsPath = path.join(WORKSPACE_PATH, '.config', 'crons.json');
+    const cronsPath = path.join(DATA_PATH, 'crons.json');
     if (fs.existsSync(cronsPath)) {
       const content = fs.readFileSync(cronsPath, 'utf8');
       const config = JSON.parse(content);

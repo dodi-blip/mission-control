@@ -1,0 +1,29 @@
+[
+  {
+    "name": "morning-brief",
+    "description": "Daily morning brief at 08:00 Dubai time",
+    "schedule": "0 4 * * *",
+    "timezone": "Asia/Dubai",
+    "displayTime": "08:00 Dubai",
+    "frequency": "Daily",
+    "nextRun": "2026-03-05T04:00:00Z"
+  },
+  {
+    "name": "eod-recap",
+    "description": "End of day recap at 17:00 Dubai time",
+    "schedule": "0 13 * * *",
+    "timezone": "UTC",
+    "displayTime": "17:00 Dubai",
+    "frequency": "Daily",
+    "nextRun": "2026-03-04T13:00:00Z"
+  },
+  {
+    "name": "friday-meeting-prep",
+    "description": "Friday team meeting prep at 08:00 Amsterdam time",
+    "schedule": "0 6 * * 5",
+    "timezone": "Europe/Amsterdam",
+    "displayTime": "08:00 Amsterdam",
+    "frequency": "Weekly (Friday)",
+    "nextRun": "2026-03-06T06:00:00Z"
+  }
+]
