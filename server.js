@@ -31,19 +31,32 @@ async function fetchClickUpData() {
     
     let allTasks = [];
     
-    // Get tasks from each space
+    // Get tasks from each space via lists
     for (const space of spacesRes.data.spaces) {
       try {
-        const tasksRes = await axios.get(
-          `${CLICKUP_API}/space/${space.id}/task?archived=false&limit=100&include_closed=true`,
+        // First, get all lists in this space
+        const listsRes = await axios.get(
+          `${CLICKUP_API}/space/${space.id}/list?archived=false`,
           { headers: { Authorization: CLICKUP_TOKEN } }
         );
         
-        if (tasksRes.data.tasks) {
-          allTasks = allTasks.concat(tasksRes.data.tasks);
+        // Then get tasks from each list
+        for (const list of listsRes.data.lists) {
+          try {
+            const tasksRes = await axios.get(
+              `${CLICKUP_API}/list/${list.id}/task?archived=false&limit=100&include_closed=true`,
+              { headers: { Authorization: CLICKUP_TOKEN } }
+            );
+            
+            if (tasksRes.data.tasks) {
+              allTasks = allTasks.concat(tasksRes.data.tasks);
+            }
+          } catch (e) {
+            console.log(`Error fetching tasks from list ${list.id}:`, e.response?.status, e.response?.data?.err || e.message);
+          }
         }
       } catch (e) {
-        console.log(`Error fetching tasks from space ${space.id}:`, e.response?.status, e.response?.data?.err || e.message);
+        console.log(`Error fetching lists from space ${space.id}:`, e.response?.status, e.response?.data?.err || e.message);
       }
     }
     
