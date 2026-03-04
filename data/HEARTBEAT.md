@@ -2,11 +2,11 @@
 
 ## Daily Reminders
 
-### Google Ads API Billing Check (include in morning brief TO-DO list)
-- Status: Waiting for quota approval + billing account activation
-- Show in: Morning brief as priority task
-- Action: Once billing is active, run sync script: `cd ~/.openclaw/workspace/.config && node google-ads-sync.js`
-- Context: See `memory/google-ads-setup.md` for full details
+### Google Ads API (include in morning brief TO-DO list)
+- Status: ⏳ Waiting for Basic Access approval from Google (applied 2026-03-04 14:24 UTC, usually 24h)
+- Current: Explorer access (API blocked), OAuth + credentials ready
+- Action: Once approved → test connection, then enable daily syncs
+- Context: Developer token 53g-frDk6ztKDj_SAom5Gw, customer ID 163-303-7933, creds in `/root/.openclaw/credentials/google-ads.json`
 
 ### Meta Ads Setup (include in TO-DO when ready)
 - Status: Paused — app is live, need redirect URI fix
