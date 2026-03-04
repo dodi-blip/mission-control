@@ -448,11 +448,16 @@
             name.className = 'task-name';
             name.textContent = item.name || 'Untitled';
 
+            const frequency = document.createElement('div');
+            frequency.className = 'task-meta';
+            frequency.textContent = `${item.frequency || 'Unknown'} • ${item.displayTime || item.schedule}`;
+
             const meta = document.createElement('div');
             meta.className = 'task-meta';
             meta.textContent = `Next: ${new Date(item.nextRun).toLocaleString()}`;
 
             li.appendChild(name);
+            li.appendChild(frequency);
             li.appendChild(meta);
           } else if (type === 'idea') {
             const name = document.createElement('div');

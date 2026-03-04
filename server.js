@@ -93,9 +93,12 @@ function getCronJobs() {
         config.forEach(cron => {
           crons.push({
             name: cron.name || 'Unnamed',
+            description: cron.description || '',
             schedule: cron.schedule || '*',
-            command: cron.command || '',
-            nextRun: cron.nextRun || new Date().toISOString()
+            displayTime: cron.displayTime || cron.schedule,
+            frequency: cron.frequency || 'Unknown',
+            nextRun: cron.nextRun || new Date().toISOString(),
+            timezone: cron.timezone || 'UTC'
           });
         });
       }
@@ -127,9 +130,12 @@ function getCronJobs() {
       
       crons.push({
         name,
+        description: command,
         schedule: `${minute} ${hour} * * ${weekday}`,
-        command,
-        nextRun: calculateNextRun(minute, hour, weekday)
+        displayTime: `${hour}:${minute}`,
+        frequency: 'Daily',
+        nextRun: calculateNextRun(minute, hour, weekday),
+        timezone: 'Local'
       });
     }
   } catch (e) {
