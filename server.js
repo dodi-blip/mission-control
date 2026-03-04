@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
-const CLICKUP_TOKEN = 'pk_10935568_X9CYUYXG7KGVUHF0J6T86HMOTGN44AAP';
+const CLICKUP_TOKEN = process.env.CLICKUP_TOKEN || 'pk_10935568_X9CYUYXG7KGVUHF0J6T86HMOTGN44AAP';
 const CLICKUP_API = 'https://api.clickup.com/api/v2';
 
 app.use(express.static('public'));
