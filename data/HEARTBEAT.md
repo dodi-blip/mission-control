@@ -22,6 +22,7 @@
 ### Daily Hello + EOD Recap — ✅ LIVE
 - Morning brief: 08:00 Dubai time daily (cron: morning-brief)
   - Includes: Your ClickUp tasks (today + upcoming), overdue tasks from colleagues, emails, calendar
+  - Format: **Clean new message in main channel** (NOT threaded)
 - EOD recap: 17:00 Dubai time daily (cron: eod-recap)
 - Friday meeting prep: 08:00 Amsterdam time every Friday (cron: friday-meeting-prep)
 - Note: Crons are set to Dubai timezone. If Dodi travels, update timezone in crons.
