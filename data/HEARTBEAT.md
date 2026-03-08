@@ -19,13 +19,12 @@
 - Context: ClickUp connected, team roles mapped, workflow designed
 - Remove from TO-DO once month + discounts confirmed
 
-### Daily Hello + EOD Recap — ✅ LIVE
-- Morning brief: 08:00 Dubai time daily (cron: morning-brief)
-  - Includes: Your ClickUp tasks (today + upcoming), overdue tasks from colleagues, emails, calendar
-  - Format: **Clean new message in main channel** (NOT threaded)
-- EOD recap: 17:00 Dubai time daily (cron: eod-recap)
-- Friday meeting prep: 08:00 Amsterdam time every Friday (cron: friday-meeting-prep)
-- Note: Crons are set to Dubai timezone. If Dodi travels, update timezone in crons.
+### Daily Hello + EOD Recap — ⏸️ PAUSED (2026-03-08)
+- Morning brief: PAUSED (was: 08:00 Dubai time daily)
+- EOD recap: PAUSED (was: 17:00 Dubai time daily)
+- Friday meeting prep: PAUSED (was: 08:00 Amsterdam time every Friday)
+- Reason: Not valuable in current context
+- Resume: When Dodi asks
 
 ## Periodic Checks (rotate, 2-4x per day)
 - Email: Check for urgent unread (dodi@furnicher.com, dodi@interioreditions.com)
