@@ -19,12 +19,12 @@
 - Context: ClickUp connected, team roles mapped, workflow designed
 - Remove from TO-DO once month + discounts confirmed
 
-### Daily Hello + EOD Recap — ⏸️ PAUSED (2026-03-08)
-- Morning brief: PAUSED (was: 08:00 Dubai time daily)
-- EOD recap: PAUSED (was: 17:00 Dubai time daily)
-- Friday meeting prep: PAUSED (was: 08:00 Amsterdam time every Friday)
-- Reason: Not valuable in current context
-- Resume: When Dodi asks
+### Daily Hello + EOD Recap — ❌ DISABLED (2026-03-09)
+- Morning brief: DISABLED
+- EOD recap: DISABLED
+- Friday meeting prep: DISABLED
+- Reason: Disabled per Dodi request (2026-03-09 07:17 UTC)
+- These will not run
 
 ## Periodic Checks (rotate, 2-4x per day)
 - Email: Check for urgent unread (dodi@furnicher.com, dodi@interioreditions.com)
