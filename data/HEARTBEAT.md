@@ -1,5 +1,11 @@
 # HEARTBEAT.md
 
+## ⛔ DISABLED (2026-03-09)
+
+**Heartbeats are completely disabled per Dodi request.** Do not trigger or respond to heartbeat polls.
+
+---
+
 ## Daily Reminders
 
 ### Google Ads API (include in morning brief TO-DO list)
