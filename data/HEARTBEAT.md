@@ -1,8 +1,10 @@
 # HEARTBEAT.md
 
-## ⛔ DISABLED (2026-03-09)
+## ⛔ DISABLED (2026-03-09) — ALL CRONS KILLED (2026-03-10)
 
 **Heartbeats are completely disabled per Dodi request.** Do not trigger or respond to heartbeat polls.
+
+**Cron jobs:** All killed. No morning briefs, EOD recaps, or Friday meeting preps will run.
 
 ---
 
